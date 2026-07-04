@@ -14,10 +14,6 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
-    @GetMapping
-    public String check() {
-        return "Employee Controller is working";
-    }
 
     @PostMapping
     public EmployeeResponse save(@RequestBody EmployeeRequest employeeRequest) {
