@@ -1,0 +1,36 @@
+package com.sts.jpa.controller;
+
+import com.sts.jpa.model.EmployeeRequest;
+import com.sts.jpa.model.EmployeeResponse;
+import com.sts.jpa.services.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(value = "/employee")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService employeeService;
+    @GetMapping
+    public String check() {
+        return "Employee Controller is working";
+    }
+
+    @PostMapping
+    public EmployeeResponse save(@RequestBody EmployeeRequest employeeRequest) {
+       return employeeService.save(employeeRequest);
+    }
+
+    @GetMapping("{empId}")
+    public EmployeeResponse get(@PathVariable("empId") int empId){
+        return employeeService.getEmp(empId);
+    }
+
+    @GetMapping
+    public List<EmployeeResponse> getAll(){
+        return employeeService.getAll();
+    }
+}
