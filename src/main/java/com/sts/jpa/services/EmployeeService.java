@@ -4,6 +4,7 @@ import com.sts.jpa.entity.Employee;
 import com.sts.jpa.model.EmployeeRequest;
 import com.sts.jpa.model.EmployeeResponse;
 import com.sts.jpa.repository.EmployeeRepo;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,22 +22,9 @@ public class EmployeeService {
     public EmployeeResponse save(EmployeeRequest employeeRequest) {
 
         try {
-            //generate EMPID
-            List<Employee> employeesList = employeeRepo.findAll();
-            // 1012
-            AtomicInteger maxEmpId = new AtomicInteger();
-            employeesList
-                    .parallelStream()
-                    .max((e1, e2) -> Integer.compare(e1.getEmpId(), e2.getEmpId()))
-                    .ifPresent(e -> maxEmpId.set(e.getEmpId()));
-            int maxEmpID = maxEmpId.get();
-            int NextEmpID = 1001;
-            if (maxEmpID != 0) {
-                NextEmpID = maxEmpID + 2;
-            }
+            int NextEmpID = getNextEmpID();
 
-            // generate emailId
-            String empEmailId = employeeRequest.getName().concat("@sts.com");
+            String empEmailId = generateEmailId(employeeRequest.getName());
 
             Employee employee = new Employee();
             employee.setEmpId(NextEmpID);
@@ -53,12 +41,7 @@ public class EmployeeService {
             Employee savedEmployee = employeeRepo.save(employee);
 
             // populate employee Response
-            EmployeeResponse employeeResponse = new EmployeeResponse();
-            employeeResponse.setEmpId(savedEmployee.getEmpId());
-            employeeResponse.setEmailId(savedEmployee.getEmailId());
-            employeeResponse.setSkill(savedEmployee.getSkill());
-            employeeResponse.setExp(savedEmployee.getExp());
-            employeeResponse.setName(savedEmployee.getName());
+            EmployeeResponse employeeResponse = getEmployeeResponse(savedEmployee);
 
             return employeeResponse;
 
@@ -68,19 +51,44 @@ public class EmployeeService {
         return null;
     }
 
+    private EmployeeResponse getEmployeeResponse(Employee savedEmployee) {
+        EmployeeResponse employeeResponse = new EmployeeResponse();
+        employeeResponse.setEmpId(savedEmployee.getEmpId());
+        employeeResponse.setEmailId(savedEmployee.getEmailId());
+        employeeResponse.setSkill(savedEmployee.getSkill());
+        employeeResponse.setExp(savedEmployee.getExp());
+        employeeResponse.setName(savedEmployee.getName());
+        return employeeResponse;
+    }
+
+    private String generateEmailId(String name) {
+        String empEmailId = name.concat("@sts.com");
+        return empEmailId;
+    }
+
+    private int getNextEmpID() {
+        //generate EMPID
+        List<Employee> employeesList = employeeRepo.findAll();
+        // 1012
+        AtomicInteger maxEmpId = new AtomicInteger();
+        employeesList
+                .parallelStream()
+                .max((e1, e2) -> Integer.compare(e1.getEmpId(), e2.getEmpId()))
+                .ifPresent(e -> maxEmpId.set(e.getEmpId()));
+        int maxEmpID = maxEmpId.get();
+        int NextEmpID = 1001;
+        if (maxEmpID != 0) {
+            NextEmpID = maxEmpID + 2;
+        }
+        return NextEmpID;
+    }
+
     public EmployeeResponse getEmp(int empId) {
         EmployeeResponse employeeResponse = null;
         try {
             Employee employee = employeeRepo.getEmployeeById(empId);
-
-            employeeResponse = new EmployeeResponse();
-            employeeResponse.setEmpId(employee.getEmpId());
-            employeeResponse.setEmailId(employee.getEmailId());
-            employeeResponse.setSkill(employee.getSkill());
-            employeeResponse.setExp(employee.getExp());
-            employeeResponse.setName(employee.getName());
+            employeeResponse = getEmployeeResponse(employee);
             return employeeResponse;
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,12 +101,7 @@ public class EmployeeService {
             List<Employee> employeeList = employeeRepo.findAll();
 
             for (Employee emp : employeeList) {
-                EmployeeResponse employeeResponse = new EmployeeResponse();
-                employeeResponse.setEmpId(emp.getEmpId());
-                employeeResponse.setEmailId(emp.getEmailId());
-                employeeResponse.setSkill(emp.getSkill());
-                employeeResponse.setExp(emp.getExp());
-                employeeResponse.setName(emp.getName());
+                EmployeeResponse employeeResponse = getEmployeeResponse(emp);
 
                 employeeResponseList.add(employeeResponse);
             }
