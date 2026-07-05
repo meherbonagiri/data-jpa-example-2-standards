@@ -17,16 +17,22 @@ public class EmployeeController {
 
     @PostMapping
     public EmployeeResponse save(@RequestBody EmployeeRequest employeeRequest) {
-       return employeeService.save(employeeRequest);
+        return employeeService.save(employeeRequest);
     }
 
     @GetMapping("{empId}")
-    public EmployeeResponse get(@PathVariable("empId") int empId){
+    public EmployeeResponse get(@PathVariable("empId") int empId) {
         return employeeService.getEmp(empId);
     }
 
     @GetMapping
-    public List<EmployeeResponse> getAll(){
+    public List<EmployeeResponse> getAll() {
         return employeeService.getAll();
     }
+
+    @DeleteMapping("{empId}")
+    public EmployeeResponse delete(@PathVariable("empId") int empId) {
+        return employeeService.delete(empId);
+    }
+
 }
