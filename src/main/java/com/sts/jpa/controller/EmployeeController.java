@@ -2,6 +2,7 @@ package com.sts.jpa.controller;
 
 import com.sts.jpa.model.EmployeeRequest;
 import com.sts.jpa.model.EmployeeResponse;
+import com.sts.jpa.model.EmployeeUpdateRequest;
 import com.sts.jpa.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,4 +36,8 @@ public class EmployeeController {
         return employeeService.delete(empId);
     }
 
+    @PutMapping
+    public EmployeeResponse update(@RequestBody EmployeeUpdateRequest employeeUpdateRequest){
+        return employeeService.update(employeeUpdateRequest);
+    }
 }

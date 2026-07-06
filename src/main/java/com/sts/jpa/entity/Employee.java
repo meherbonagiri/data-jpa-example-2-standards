@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -36,12 +39,17 @@ public class Employee {
     @Column(name = "skill", nullable = false, unique = false)
     private String skill;
 
+    @CreationTimestamp
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
+
+    @UpdateTimestamp
     @Column(name = "updated_date", nullable = false)
     private LocalDateTime updatedDate;
+
     @Column(name = "created_user", nullable = false, unique = false)
     private String createdUser;
+
     @Column(name = "updated_user", nullable = false, unique = false)
     private String updatedUser;
 

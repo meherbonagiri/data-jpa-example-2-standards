@@ -1,13 +1,14 @@
 package com.sts.jpa.services;
 
 import com.sts.jpa.entity.Employee;
-import com.sts.jpa.exception.EmployeeNotFoundException;
 import com.sts.jpa.exception.FailedToFetchEmployeeRecords;
 import com.sts.jpa.model.EmployeeRequest;
 import com.sts.jpa.model.EmployeeResponse;
+import com.sts.jpa.model.EmployeeUpdateRequest;
 import com.sts.jpa.repository.EmployeeRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,8 +33,8 @@ public class EmployeeService {
             employee.setName(employeeRequest.name());
             employee.setExp(employeeRequest.exp());
             employee.setSkill(employeeRequest.skill());
-            employee.setCreatedDate(LocalDateTime.now());
-            employee.setUpdatedDate(LocalDateTime.now());
+           // employee.setCreatedDate(LocalDateTime.now());
+           // employee.setUpdatedDate(LocalDateTime.now());
             employee.setCreatedUser("STS");
             employee.setUpdatedUser("STS");
             employee.setVersion(1.0);
@@ -104,8 +105,8 @@ public class EmployeeService {
             employeeResponse = getEmployeeResponse(employee);
         } catch (Exception e) {
             employeeResponse = EmployeeResponse.builder()
-                    .errorCode(404)
-                    .errorDescription("Employee Not Found with empId=".concat(String.valueOf(empId)))
+                    .code(404)
+                    .description("Employee Not Found with empId=".concat(String.valueOf(empId)))
                     .build();
         }
         return employeeResponse;
@@ -130,12 +131,45 @@ public class EmployeeService {
         EmployeeResponse employeeResponse = new EmployeeResponse();
         try {
             employeeRepo.deleteByEmpId(empId);
-            employeeResponse.setErrorCode(200);
-            employeeResponse.setErrorDescription("Employee Deleted Successfully");
+            employeeResponse.setCode(200);
+            employeeResponse.setDescription("Employee Deleted Successfully");
         } catch (Exception e) {
-            employeeResponse.setErrorCode(500);
-            employeeResponse.setErrorDescription("Employee Failed to delete with empId=".concat(String.valueOf(empId)));
+            employeeResponse.setCode(500);
+            employeeResponse.setDescription("Employee Failed to delete with empId=".concat(String.valueOf(empId)));
         }
         return employeeResponse;
+    }
+
+    public EmployeeResponse update(EmployeeUpdateRequest employeeUpdateRequest) {
+        try {
+            final int empId = employeeUpdateRequest.empId();
+
+            Employee employee = employeeRepo.findByEmpId(empId);
+
+            if (employeeUpdateRequest.exp() != 0) {
+                employee.setExp(employeeUpdateRequest.exp());
+            }
+
+            if (!StringUtils.isEmpty(employeeUpdateRequest.skill())) { //employeeUpdateRequest.skill() != null && !employeeUpdateRequest.skill().equals("")
+                String existingSkill = employee.getSkill();
+                String updatedSkill = existingSkill.concat(",").concat(employeeUpdateRequest.skill());
+                employee.setSkill(updatedSkill);
+            }
+
+            // replaced with @UpdatedTimeStamp in entity
+           // employee.setUpdatedDate(LocalDateTime.now());
+            Employee savedEmployee = employeeRepo.save(employee);
+
+            EmployeeResponse employeeResponse = getEmployeeResponse(savedEmployee);
+            employeeResponse.setCode(2001);
+            employeeResponse.setDescription("Employee Updated Successfully");
+            return employeeResponse;
+
+        } catch (Exception e) {
+            EmployeeResponse employeeResponse = new EmployeeResponse();
+            employeeResponse.setCode(5001);
+            employeeResponse.setDescription("Failed to update employee");
+            return employeeResponse;
+        }
     }
 }

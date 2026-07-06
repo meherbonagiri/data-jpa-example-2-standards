@@ -17,6 +17,6 @@ public class EmployeeResponse {
     private double exp;
     private String skill;
 
-    private int errorCode;
-    private String errorDescription;
+    private int code;
+    private String description;
 }
