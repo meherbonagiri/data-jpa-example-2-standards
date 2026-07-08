@@ -6,6 +6,7 @@ import com.sts.jpa.model.EmployeeRequest;
 import com.sts.jpa.model.EmployeeResponse;
 import com.sts.jpa.model.EmployeeUpdateRequest;
 import com.sts.jpa.repository.EmployeeRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 @Service
 public class EmployeeService {
 
@@ -33,8 +35,8 @@ public class EmployeeService {
             employee.setName(employeeRequest.name());
             employee.setExp(employeeRequest.exp());
             employee.setSkill(employeeRequest.skill());
-           // employee.setCreatedDate(LocalDateTime.now());
-           // employee.setUpdatedDate(LocalDateTime.now());
+            // employee.setCreatedDate(LocalDateTime.now());
+            // employee.setUpdatedDate(LocalDateTime.now());
             employee.setCreatedUser("STS");
             employee.setUpdatedUser("STS");
             employee.setVersion(1.0);
@@ -43,11 +45,10 @@ public class EmployeeService {
 
             // populate employee Response
             EmployeeResponse employeeResponse = getEmployeeResponse(savedEmployee);
-
+            log.info("Employee saved successfully with ID: {}", savedEmployee.getEmpId());
             return employeeResponse;
-
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Exception occurred during saving the employee with= {}, error={}", employeeRequest, e.getMessage());
         }
         return null;
     }
@@ -157,7 +158,7 @@ public class EmployeeService {
             }
 
             // replaced with @UpdatedTimeStamp in entity
-           // employee.setUpdatedDate(LocalDateTime.now());
+            // employee.setUpdatedDate(LocalDateTime.now());
             Employee savedEmployee = employeeRepo.save(employee);
 
             EmployeeResponse employeeResponse = getEmployeeResponse(savedEmployee);
